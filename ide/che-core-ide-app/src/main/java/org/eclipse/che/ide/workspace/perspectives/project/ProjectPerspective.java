@@ -67,7 +67,7 @@ public class ProjectPerspective extends AbstractPerspective {
 
         addPart(notificationManager, INFORMATION);
         addPart(projectExplorerPart, NAVIGATION);
-                PartStack navigatorPanel = getPartStack(NAVIGATION);
+        PartStack navigatorPanel = getPartStack(NAVIGATION);
         PartStack editorPanel = getPartStack(EDITING);
         PartStack toolPanel = getPartStack(TOOLING);
         PartStack infoPanel = getPartStack(INFORMATION);

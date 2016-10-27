@@ -36,9 +36,31 @@ public interface WorkBenchPartController {
     void setSize(double size);
 
     /**
+     * Get default part stack size.
+     *
+     * @return the size
+     */
+    double getDefaultSize();
+
+    /**
+     * Set default part stack size.
+     *
+     * @param size
+     *         size which need set
+     */
+    void setDefaultSize(double size);
+
+    /**
      * Maximizes part stack.
      */
     void maximize();
+
+    /**
+     * Get minimum allowable size for the part stack.
+     *
+     * @return the size
+     */
+    int getMinSize();
 
     /**
      * Sets the minimum allowable size for the part.

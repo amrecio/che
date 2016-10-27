@@ -51,12 +51,6 @@ import java.util.Map;
  */
 public class PartStackPresenter implements Presenter, PartStackView.ActionDelegate, PartButton.ActionDelegate, PartStack {
 
-    /** The default size for the part. */
-    private static final double DEFAULT_PART_SIZE = 260;
-
-    /** The minimum allowable size for the part. */
-    private static final int MIN_PART_SIZE = 100;
-
     private final WorkBenchPartController         workBenchPartController;
     private final PartsComparator                 partsComparator;
     private final Map<PartPresenter, Constraints> constraints;
@@ -69,7 +63,7 @@ public class PartStackPresenter implements Presenter, PartStackView.ActionDelega
 
     protected PartPresenter activePart;
     protected TabItem       activeTab;
-    protected double        currentSize;
+    protected double        partStackSize;
 
     @Inject
     public PartStackPresenter(final EventBus eventBus,
@@ -99,13 +93,6 @@ public class PartStackPresenter implements Presenter, PartStackView.ActionDelega
                 }
             }
         };
-
-        if (workBenchPartController != null) {
-            this.workBenchPartController.setSize(DEFAULT_PART_SIZE);
-            this.workBenchPartController.setMinSize(MIN_PART_SIZE);
-        }
-
-        currentSize = DEFAULT_PART_SIZE;
     }
 
     private void updatePartTab(@NotNull PartPresenter part) {
@@ -280,7 +267,7 @@ public class PartStackPresenter implements Presenter, PartStackView.ActionDelega
         if (selectedTab.equals(activeTab)) {
             selectedTab.unSelect();
 
-            currentSize = workBenchPartController.getSize();
+            partStackSize = workBenchPartController.getSize();
 
             workBenchPartController.setSize(0);
 
@@ -297,15 +284,27 @@ public class PartStackPresenter implements Presenter, PartStackView.ActionDelega
     }
 
     private void selectActiveTab(@NotNull TabItem selectedTab) {
-        double partSize = workBenchPartController.getSize();
-        currentSize = partSize >= MIN_PART_SIZE ? partSize : currentSize;
-
-        workBenchPartController.setSize(currentSize);
+        partStackSize = getPartStackSize();
+        workBenchPartController.setSize(partStackSize);
         workBenchPartController.setHidden(false);
 
         PartPresenter selectedPart = parts.get(selectedTab);
 
         view.selectTab(selectedPart);
+    }
+
+    private double getPartStackSize() {
+        double currentSize = workBenchPartController.getSize();
+        if (!workBenchPartController.isHidden()) {
+            return currentSize;
+        }
+
+        int minSize = workBenchPartController.getMinSize();
+        if (partStackSize >= minSize) {
+            return partStackSize;
+        }
+
+        return workBenchPartController.getDefaultSize();
     }
 
     /** Handles PartStack actions */

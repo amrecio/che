@@ -270,7 +270,7 @@ public class PartStackPresenterTest {
 
         presenter.onTabClicked(partButton);
 
-        verify(workBenchPartController).setSize(eq(presenter.currentSize));
+        verify(workBenchPartController).setSize(eq(presenter.partStackSize));
         verify(workBenchPartController).setHidden(false);
 
         verify(view).selectTab(partPresenter);

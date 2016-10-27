@@ -53,6 +53,7 @@ import static org.eclipse.che.ide.api.parts.PartStackView.TabPosition.RIGHT;
  */
 //TODO need rewrite this, remove direct dependency on PerspectiveViewImpl and other GWT Widgets
 public abstract class AbstractPerspective implements Presenter, Perspective, ActivePartChangedHandler {
+    public final static double TOOLING_PARTSTACK_DEFAULT_SIZE = 750;
 
     protected final Map<PartStackType, PartStack> partStacks;
     protected final PerspectiveViewImpl           view;
@@ -96,6 +97,7 @@ public abstract class AbstractPerspective implements Presenter, Perspective, Act
         PartStackView toolingView = partViewFactory.create(RIGHT, view.getRightPanel());
 
         rightPartController = controllerFactory.createController(view.getSplitPanel(), view.getToolPanel());
+        rightPartController.setDefaultSize(TOOLING_PARTSTACK_DEFAULT_SIZE);
         PartStack toolingPartStack = stackPresenterFactory.create(toolingView, rightPartController);
         partStacks.put(TOOLING, toolingPartStack);
 

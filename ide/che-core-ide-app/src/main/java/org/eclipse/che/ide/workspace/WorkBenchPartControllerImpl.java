@@ -23,8 +23,12 @@ import com.google.inject.assistedinject.Assisted;
  * @author Dmitry Shnurenko
  */
 public class WorkBenchPartControllerImpl implements WorkBenchPartController {
-
     public static final int DURATION = 200;
+
+    /** The default size for the part stack. */
+    private double defaultSize = 260;
+    /** The minimum allowable size for the part stack. */
+    private int    minSize     = 100;
 
     private final SplitLayoutPanel splitLayoutPanel;
     private final SimplePanel      widget;
@@ -37,6 +41,8 @@ public class WorkBenchPartControllerImpl implements WorkBenchPartController {
 
         splitLayoutPanel.setWidgetToggleDisplayAllowed(widget, true);
         splitLayoutPanel.setWidgetHidden(widget, true);
+        splitLayoutPanel.setWidgetSize(widget, defaultSize);
+        splitLayoutPanel.setWidgetMinSize(widget, minSize);
         splitLayoutPanel.forceLayout();
     }
 
@@ -51,6 +57,17 @@ public class WorkBenchPartControllerImpl implements WorkBenchPartController {
     public void setSize(double size) {
         splitLayoutPanel.setWidgetSize(widget, size);
         splitLayoutPanel.animate(DURATION);
+    }
+
+    @Override
+    public double getDefaultSize() {
+        return defaultSize;
+    }
+
+    @Override
+    public void setDefaultSize(double size) {
+        defaultSize = size;
+        setSize(size);
     }
 
     @Override
@@ -87,7 +104,13 @@ public class WorkBenchPartControllerImpl implements WorkBenchPartController {
     }
 
     @Override
-    public void setMinSize(int minSize) {
+    public int getMinSize() {
+        return minSize;
+    }
+
+    @Override
+    public void setMinSize(int size) {
+        minSize = size;
         splitLayoutPanel.setWidgetMinSize(widget, minSize);
     }
 
