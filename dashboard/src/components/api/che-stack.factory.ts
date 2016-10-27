@@ -17,6 +17,18 @@
  * @author Ann Shumilova
  */
 export class CheStack {
+  $resource: ng.resource.IResourceService;
+  stacksById: {[stackId: string]: {stack: any}};
+  stacks: Array<any>;
+  usedStackNames: Array<string>;
+  remoteStackAPI: ng.resource.IResourceClass<ng.resource.IResource<any>>;
+  remoteStackAPI: {
+    getStacks: Function,
+    getStack: Function,
+    updateStack: Function,
+    createStack: Function,
+    deleteStack: Function
+  };
 
   /**
    * Default constructor that is using resource
@@ -33,6 +45,9 @@ export class CheStack {
     // stacks
     this.stacks = [];
 
+    // stack names
+    this.usedStackNames = [];
+
     // remote call
     this.remoteStackAPI = this.$resource('/api/stack', {}, {
       getStacks: {method: 'GET', url: '/api/stack?maxItems=50', isArray: true}, //TODO 50 items is temp solution while paging is not added
@@ -43,6 +58,71 @@ export class CheStack {
     });
   }
 
+  /**
+   * Gets stack template
+   * @returns {stack}
+   */
+  getStackTemplate(): any {
+    let stack: any = {
+      'name': 'New Stack',
+      'description': 'New Java Stack',
+      'scope': 'general',
+      'tags': [
+        'Java 1.8'
+      ],
+      'components': [],
+      'source': {
+        'type': 'image',
+        'origin': 'codenvy/ubuntu_jdk8'
+      },
+      'workspaceConfig': {
+        'environments': {
+          'default': {
+            'machines': {
+              'dev-machine': {
+                'agents': [
+                  'org.eclipse.che.terminal', 'org.eclipse.che.ws-agent', 'org.eclipse.che.ssh'
+                ],
+                'servers': {},
+                'attributes': {
+                  'memoryLimitBytes': '2147483648'
+                }
+              }
+            },
+            'recipe': {
+              'content': 'services:\n dev-machine:\n  image: codenvy/ubuntu_jdk8\n',
+              'contentType': 'application/x-yaml',
+              'type': 'compose'
+            }
+          }
+        },
+        'name': 'default',
+        'defaultEnv': 'default',
+        'description': null,
+        'commands': []
+      }
+    };
+
+    if (!this.isUniqueName(stack.name)) {
+      stack.name += ' ';
+      for (let pos: number = 1; pos < 1000; pos++) {
+        if (this.isUniqueName(stack.name + pos.toString())) {
+          stack.name += pos.toString();
+          break;
+        }
+      }
+    }
+    return stack;
+  }
+
+  /**
+   * Check if the stack's name is unique.
+   * @param name: string
+   * @returns {boolean}
+   */
+  isUniqueName(name: string): boolean {
+    return this.usedStackNames.indexOf(name) === -1;
+  }
 
   /**
    * Fetch the stacks
@@ -50,18 +130,17 @@ export class CheStack {
   fetchStacks() {
     let promise = this.remoteStackAPI.getStacks().$promise;
     let updatedPromise = promise.then((stacks) => {
-      // reset global list
+      // reset global stacks list
       this.stacks.length = 0;
-      for (var member in this.stacksById) {
+      for (let member: any in this.stacksById) {
         delete this.stacksById[member];
       }
-
-      stacks.forEach((stack) => {
-        // get attributes
-        var stackId = stack.id;
-
+      // reset global stack names list
+      this.usedStackNames.length = 0;
+      stacks.forEach((stack: any) => {
+        this.usedStackNames.push(stack.name);
         // add element on the list
-        this.stacksById[stackId] = stack;
+        this.stacksById[stack.id] = stack;
         this.stacks.push(stack);
       });
     });
